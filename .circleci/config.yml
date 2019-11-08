@@ -1,0 +1,26 @@
+version: 2
+jobs:
+	build:
+		docker:
+			-image: circleci/python:3.6
+		steps:
+			- checkout
+			- restore_cache:
+				key: deps1-{{ .Branch }}-{{ checksum "requirement.txt" }}
+			- run:
+				command: |
+					python3 -m venv Env 
+					. Env/bin/activate
+					pip install -r requirement.txt
+			- save_cache:
+				key: deps1-{{ .Branch }}-{{ checksum "requirement.txt" }}
+				path:
+					- "Env"
+			- run:
+				name: Running tests
+				command: |
+					.Env/bin/activate
+					python3 test.py
+			-store_artifacts:
+				path: test-reports/
+				destination: python_app
